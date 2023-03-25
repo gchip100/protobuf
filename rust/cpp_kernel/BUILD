@@ -19,3 +19,13 @@ rust_test(
         "notsan",
     ],
 )
+
+cc_library(
+    name = "cpp_thunks_api",
+    hdrs = ["cpp.h"],
+    visibility = [
+        "//src/google/protobuf:__subpackages__",
+        "//rust:__subpackages__",
+    ],
+    deps = ["//third_party/absl/algorithm:container"],
+)

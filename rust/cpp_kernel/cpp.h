@@ -28,51 +28,36 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Rust Protobuf runtime using the C++ kernel.
+// This file contains support code for generated C++ thunks.
 
-use std::boxed::Box;
-use std::ops::Deref;
-use std::ptr::NonNull;
-use std::slice;
+#ifndef GOOGLE_PROTOBUF_RUST_CPP_KERNEL_CPP_H__
+#define GOOGLE_PROTOBUF_RUST_CPP_KERNEL_CPP_H__
 
-/// TODO(b/272728844): Replace this placeholder code with a real implementation.
-#[repr(C)]
-pub struct Arena {
-    _data: [u8; 0],
+#include <cstddef>
+#include <string>
+
+#include "absl/algorithm/container.h"
+
+namespace protobuf {
+
+// Represents serialized Protobuf wire format data. It's typically produced by
+// `<Message>.SerializeToString()`.
+//
+// This stuct is ABI compatible with the equivalend struct on the
+// Rust side.
+//
+struct SerializedData {
+  const char* data;
+  size_t size;
+};
+
+inline SerializedData MakeSerializedDataFromString(std::string serialized) {
+  char* raw_data = new char[serialized.size()];
+  absl::c_copy(serialized, raw_data);
+  SerializedData result{.data = raw_data, .size = serialized.size()};
+  return result;
 }
 
-impl Arena {
-    pub unsafe fn new() -> *mut Self {
-        let arena = Box::new(Arena { _data: [] });
-        Box::leak(arena) as *mut _
-    }
+}  // namespace protobuf
 
-    pub unsafe fn free(arena: *mut Self) {
-        let arena = Box::from_raw(arena);
-        std::mem::drop(arena);
-    }
-}
-
-/// Represents serialized Protobuf wire format data. It's typically produced by
-/// `<Message>.serialize()`.
-///
-/// This stuct is ABI compatible with the equivalend struct on the C++ side.
-// copybara:strip_begin
-// LINT.IfChange
-// copybara:strip_end
-#[repr(C)]
-#[derive(Debug)]
-pub struct SerializedData {
-    data: NonNull<u8>,
-    len: usize,
-}
-// copybara:strip_begin
-// LINT.ThenChange(//depot/google3/third_party/protobuf/rust/cpp_kernel/cpp.h)
-// copybara:strip_end
-
-impl Deref for SerializedData {
-    type Target = [u8];
-    fn deref(&self) -> &Self::Target {
-        unsafe { slice::from_raw_parts(self.data.as_ptr() as *const _, self.len) }
-    }
-}
+#endif  // GOOGLE_PROTOBUF_RUST_CPP_KERNEL_CPP_H__

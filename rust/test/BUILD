@@ -4,6 +4,7 @@ load("@rules_rust//rust:defs.bzl", "rust_test")
 rust_proto_library(
     name = "unittest_rust_proto",
     testonly = True,
+    visibility = ["//rust/test:__subpackages__"],
     deps = [
         "//src/google/protobuf:test_protos",
     ],
@@ -12,10 +13,10 @@ rust_proto_library(
 rust_test(
     name = "unittest_proto_test",
     srcs = ["unittest_proto_test.rs"],
-    # TODO(b/270274576): Enable testing on arm once we have a Rust Arm toolchain.
     tags = [
+        # TODO(b/270274576): Enable testing on arm once we have a Rust Arm toolchain.
         "not_build:arm",
-        # TODO(b/225892643): Enable once we use Blaze-bootstrapped Rust toolchain.
+        # TODO(b/243126140): Enable tsan once we support sanitizers with Rust.
         "notsan",
         # TODO(b/243126140): Enable msan once we support sanitizers with Rust.
         "nomsan",
@@ -48,10 +49,10 @@ rust_proto_library(
 rust_test(
     name = "child_parent_test",
     srcs = ["child_parent_test.rs"],
-    # TODO(b/270274576): Enable testing on arm once we have a Rust Arm toolchain.
     tags = [
+        # TODO(b/270274576): Enable testing on arm once we have a Rust Arm toolchain.
         "not_build:arm",
-        # TODO(b/225892643): Enable once we use Blaze-bootstrapped Rust toolchain.
+        # TODO(b/243126140): Enable tsan once we support sanitizers with Rust.
         "notsan",
         # TODO(b/243126140): Enable msan once we support sanitizers with Rust.
         "nomsan",
